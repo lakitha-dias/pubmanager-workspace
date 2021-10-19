@@ -1,4 +1,0 @@
-spring.datasource.url=jdbc:postgresql://localhost:5432/pubmanager
-spring.datasource.username=postgres
-spring.datasource.password=Postgress@123
-server.port=8082
