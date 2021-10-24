@@ -17,9 +17,14 @@ public class UserTransaction {
 	    @Id
 	    private Integer transactionId;
 	    
-		@OneToOne(fetch = FetchType.LAZY, optional = false,targetEntity = UserCategory.class)
-		@Fetch(FetchMode.JOIN)
-		@JoinColumn(name="category_id")
+		/*
+		 * @OneToOne(fetch = FetchType.LAZY, optional = false,targetEntity =
+		 * UserCategory.class)
+		 * 
+		 * @Fetch(FetchMode.JOIN)
+		 * 
+		 * @JoinColumn(name="category_id")
+		 */
 	    private Integer categoryId;
 		
 	    private Integer userId;

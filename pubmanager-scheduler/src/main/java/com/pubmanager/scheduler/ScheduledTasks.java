@@ -5,15 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.pubmanager.scheduler.model.UserTransaction;
-import com.pubmanager.scheduler.service.UserTransactionService;
-
-import java.time.LocalDateTime;
+import com.pubmanager.scheduler.fcm.FCMMessage;
+import com.pubmanager.scheduler.fcm.FCMNotificationServer;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 
 @Component
 public class ScheduledTasks {
@@ -23,35 +17,22 @@ public class ScheduledTasks {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     
     @Autowired
-    private UserTransactionService userTransactionService;
+    private FCMNotificationServer fcmNotificationServer;
 
     @Scheduled(fixedRate = 2000)
     public void scheduleTaskWithFixedRate() {
     	
-    	var userTransactions = (List<UserTransaction>) userTransactionService.findAll();
+    	FCMMessage fcmMessage = new FCMMessage();
+    	fcmMessage.setTitle("Some long content");
+    	fcmMessage.setBody("some subject");
+    	fcmMessage.setTarget("category-threshold-exceeded");
+    	
+    	fcmNotificationServer.sendNotification(fcmMessage);
+    	
+    	
+    	//var userTransactions = (List<UserTransaction>) userTransactionService.findAll();
 
-        logger.info("Fixed Rate Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()) + " | userTransactions : "+userTransactions);
+        //logger.info("Fixed Rate Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()) + " | userTransactions : "+userTransactions);
     }
-
-    /*@Scheduled(fixedDelay = 2000)
-    public void scheduleTaskWithFixedDelay() {
-        logger.info("Fixed Delay Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException ex) {
-            logger.error("Ran into an error {}", ex);
-            throw new IllegalStateException(ex);
-        }
-    }
-
-    @Scheduled(fixedRate = 2000, initialDelay = 5000)
-    public void scheduleTaskWithInitialDelay() {
-        logger.info("Fixed Rate Task with Initial Delay :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-    }
-
-    @Scheduled(cron = "0 * * * * ?")
-    public void scheduleTaskWithCronExpression() {
-        logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-    }*/
 
 }
