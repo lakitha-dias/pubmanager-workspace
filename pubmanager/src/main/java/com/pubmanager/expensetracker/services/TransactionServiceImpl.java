@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -28,8 +30,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate) throws EtBadRequestException {
-        int transactionId = transactionRepository.create(userId, categoryId, amount, note, transactionDate);
+    public Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate) throws EtBadRequestException {
+        int transactionId = transactionRepository.create(userId, categoryId, amount, note, transactionDate,transactionLoggedDate);
         return transactionRepository.findById(userId, categoryId, transactionId);
     }
 
@@ -42,4 +44,21 @@ public class TransactionServiceImpl implements TransactionService {
     public void removeTransaction(Integer userId, Integer categoryId, Integer transactionId) throws EtResourceNotFoundException {
         transactionRepository.removeById(userId, categoryId, transactionId);
     }
+
+    
+    // All transactions for given category id and date range
+	@Override
+	public List<Transaction> findAllTransactionsByCategoryDateTime(Integer userId, Integer categoryId, Timestamp startDateTime, Timestamp endDateTime)
+			throws EtBadRequestException {
+		return transactionRepository.findAllTransactionsByCategoryDateTime(userId, categoryId, startDateTime,endDateTime);
+	}
+
+	
+	// All transactions for given  date range
+	@Override
+	public List<Transaction> findAllTransactionsByDateTime(Integer userId, Timestamp startDateTime, Timestamp endDateTime) throws EtBadRequestException {
+		return transactionRepository.findAllTransactionsByDateTime(userId, startDateTime,endDateTime);
+	}
+    
+    
 }

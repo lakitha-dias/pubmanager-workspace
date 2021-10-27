@@ -10,19 +10,25 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
-public class TransactionRepositoryImpl implements TransactionRepository {
+public  class TransactionRepositoryImpl implements TransactionRepository {
 
     private static final String SQL_FIND_ALL = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ?";
     private static final String SQL_FIND_BY_ID = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
-    private static final String SQL_CREATE = "INSERT INTO ET_TRANSACTIONS (TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE) VALUES(NEXTVAL('ET_TRANSACTIONS_SEQ'), ?, ?, ?, ?, ?)";
+    private static final String SQL_CREATE = "INSERT INTO ET_TRANSACTIONS (TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_LOGGED_DATE) VALUES(NEXTVAL('ET_TRANSACTIONS_SEQ'), ?, ?, ?, ?, ?,?)";
     private static final String SQL_UPDATE = "UPDATE ET_TRANSACTIONS SET AMOUNT = ?, NOTE = ?, TRANSACTION_DATE = ? WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
     private static final String SQL_DELETE = "DELETE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
 
+    
+    private static String SQL_FIND_ALL_TRANSACTIONS_BY_CATEGORY_DATETIME = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
+    private static String SQL_FIND_ALL_TRANSACTIONS_BY_DATETIME =  "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
+    
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -41,7 +47,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate) throws EtBadRequestException {
+    public Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate) throws EtBadRequestException {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -51,6 +57,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 ps.setDouble(3, amount);
                 ps.setString(4, note);
                 ps.setLong(5, transactionDate);
+                ps.setTimestamp(6,  transactionLoggedDate);
                 return ps;
             }, keyHolder);
             return (Integer) keyHolder.getKeys().get("TRANSACTION_ID");
@@ -83,4 +90,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 rs.getString("NOTE"),
                 rs.getLong("TRANSACTION_DATE"));
     });
+
+    
+   // All transactions for given category id and date range
+	@Override
+	public List<Transaction> findAllTransactionsByCategoryDateTime(Integer userId, Integer categoryId, Timestamp startDateTime, Timestamp endDateTime) {
+		 return jdbcTemplate.query(SQL_FIND_ALL_TRANSACTIONS_BY_CATEGORY_DATETIME, new Object[]{userId, categoryId,startDateTime,endDateTime}, transactionRowMapper);
+	}
+
+	
+	// All transactions for given  date range
+	@Override
+	public List<Transaction> findAllTransactionsByDateTime(Integer userId, Timestamp startDateTime, Timestamp endDateTime){
+		return jdbcTemplate.query(SQL_FIND_ALL_TRANSACTIONS_BY_DATETIME, new Object[]{userId,startDateTime,endDateTime}, transactionRowMapper);
+	}
+
 }
