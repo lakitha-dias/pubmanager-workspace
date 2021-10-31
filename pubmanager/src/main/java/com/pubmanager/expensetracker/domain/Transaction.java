@@ -8,17 +8,33 @@ public class Transaction {
     private Double amount;
     private String note;
     private Long transactionDate;
+    private String transactionExpenseSource;
 
-    public Transaction(Integer transactionId, Integer categoryId, Integer userId, Double amount, String note, Long transactionDate) {
+    public Transaction(Integer transactionId, Integer categoryId, Integer userId, Double amount, String note, Long transactionDate,String transactionExpenseSource) {
         this.transactionId = transactionId;
         this.categoryId = categoryId;
         this.userId = userId;
         this.amount = amount;
         this.note = note;
         this.transactionDate = transactionDate;
+        this.transactionExpenseSource = transactionExpenseSource;
     }
 
-    public Integer getTransactionId() {
+    
+    
+    public String getTransactionExpenseSource() {
+		return transactionExpenseSource;
+	}
+
+
+
+	public void setTransactionExpenseSource(String transactionExpenseSource) {
+		this.transactionExpenseSource = transactionExpenseSource;
+	}
+
+
+
+	public Integer getTransactionId() {
         return transactionId;
     }
 

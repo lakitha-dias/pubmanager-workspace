@@ -50,6 +50,7 @@ public class TransactionResource {
         String note = (String) transactionMap.get("note");
         Long transactionDate = (Long) transactionMap.get("transactionDate");
         String transactionLoggedDateString = (String) transactionMap.get("transactionLoggedDate");
+        String transactionExpenseSource = (String) transactionMap.get("transactionExpenseSource");
         
 
         SimpleDateFormat changeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -65,7 +66,7 @@ public class TransactionResource {
         }
         
         
-        Transaction transaction = transactionService.addTransaction(userId, categoryId, amount, note, transactionDate,transactionDateSQL);
+        Transaction transaction = transactionService.addTransaction(userId, categoryId, amount, note, transactionDate,transactionDateSQL,transactionExpenseSource);
         return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 
@@ -130,6 +131,8 @@ public class TransactionResource {
     
     
     // /api/categories/null/transactions/find-transactions-by-datetime
+    
+    ///api/categories/{categoryId}/transactions/find-transactions-by-category-datetime
     // All transactions for given  date range
     @PostMapping("find-transactions-by-datetime")
     public ResponseEntity<List<Transaction>> findAllTransactionsByDateTime(HttpServletRequest request,

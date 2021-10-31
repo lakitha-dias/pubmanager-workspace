@@ -13,7 +13,7 @@ public interface TransactionService {
 
     Transaction fetchTransactionById(Integer userId, Integer categoryId, Integer transactionId) throws EtResourceNotFoundException;
 
-    Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate,Timestamp transactionLoggedDate) throws EtBadRequestException;
+    Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate,Timestamp transactionLoggedDate, String transactionExpenseSource) throws EtBadRequestException;
 
     void updateTransaction(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) throws EtBadRequestException;
 

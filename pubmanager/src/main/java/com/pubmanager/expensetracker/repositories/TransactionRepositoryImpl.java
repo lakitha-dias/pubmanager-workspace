@@ -19,15 +19,15 @@ import java.util.List;
 @Repository
 public  class TransactionRepositoryImpl implements TransactionRepository {
 
-    private static final String SQL_FIND_ALL = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ?";
-    private static final String SQL_FIND_BY_ID = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
-    private static final String SQL_CREATE = "INSERT INTO ET_TRANSACTIONS (TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_LOGGED_DATE) VALUES(NEXTVAL('ET_TRANSACTIONS_SEQ'), ?, ?, ?, ?, ?,?)";
+    private static final String SQL_FIND_ALL = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_EXPENSE_SOURCE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_EXPENSE_SOURCE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
+    private static final String SQL_CREATE = "INSERT INTO ET_TRANSACTIONS (TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_LOGGED_DATE, TRANSACTION_EXPENSE_SOURCE) VALUES(NEXTVAL('ET_TRANSACTIONS_SEQ'), ?, ?, ?, ?, ?,?,?)";
     private static final String SQL_UPDATE = "UPDATE ET_TRANSACTIONS SET AMOUNT = ?, NOTE = ?, TRANSACTION_DATE = ? WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
     private static final String SQL_DELETE = "DELETE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
 
     
-    private static String SQL_FIND_ALL_TRANSACTIONS_BY_CATEGORY_DATETIME = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
-    private static String SQL_FIND_ALL_TRANSACTIONS_BY_DATETIME =  "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
+    private static String SQL_FIND_ALL_TRANSACTIONS_BY_CATEGORY_DATETIME = "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE,TRANSACTION_EXPENSE_SOURCE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
+    private static String SQL_FIND_ALL_TRANSACTIONS_BY_DATETIME =  "SELECT TRANSACTION_ID, CATEGORY_ID, USER_ID, AMOUNT, NOTE, TRANSACTION_DATE , TRANSACTION_EXPENSE_SOURCE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND ? <= TRANSACTION_LOGGED_DATE AND ? >= TRANSACTION_LOGGED_DATE";
     
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -47,7 +47,7 @@ public  class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate) throws EtBadRequestException {
+    public Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate,String transactionExpenseSource) throws EtBadRequestException {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -58,6 +58,7 @@ public  class TransactionRepositoryImpl implements TransactionRepository {
                 ps.setString(4, note);
                 ps.setLong(5, transactionDate);
                 ps.setTimestamp(6,  transactionLoggedDate);
+                ps.setString(7,  transactionExpenseSource);
                 return ps;
             }, keyHolder);
             return (Integer) keyHolder.getKeys().get("TRANSACTION_ID");
@@ -88,7 +89,8 @@ public  class TransactionRepositoryImpl implements TransactionRepository {
                 rs.getInt("USER_ID"),
                 rs.getDouble("AMOUNT"),
                 rs.getString("NOTE"),
-                rs.getLong("TRANSACTION_DATE"));
+                rs.getLong("TRANSACTION_DATE"),
+                rs.getString("TRANSACTION_EXPENSE_SOURCE"));
     });
 
     

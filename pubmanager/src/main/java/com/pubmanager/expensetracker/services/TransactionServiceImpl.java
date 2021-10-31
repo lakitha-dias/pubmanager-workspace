@@ -30,8 +30,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate) throws EtBadRequestException {
-        int transactionId = transactionRepository.create(userId, categoryId, amount, note, transactionDate,transactionLoggedDate);
+    public Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate,String transactionExpenseSource) throws EtBadRequestException {
+        int transactionId = transactionRepository.create(userId, categoryId, amount, note, transactionDate,transactionLoggedDate,transactionExpenseSource);
         return transactionRepository.findById(userId, categoryId, transactionId);
     }
 

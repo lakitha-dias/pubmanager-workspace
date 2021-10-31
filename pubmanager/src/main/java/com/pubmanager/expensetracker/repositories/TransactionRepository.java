@@ -14,7 +14,7 @@ public interface TransactionRepository {
 
     Transaction findById(Integer userId, Integer categoryId, Integer transactionId) throws EtResourceNotFoundException;
 
-    Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate) throws EtBadRequestException;
+    Integer create(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate, Timestamp transactionLoggedDate, String transactionExpenseSource) throws EtBadRequestException;
 
     void update(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) throws EtBadRequestException;
 
